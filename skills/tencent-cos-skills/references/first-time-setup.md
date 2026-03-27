@@ -174,12 +174,6 @@ coscmd config -a <Secret ID> -s <Secret Key> -b <bucket-name-appid> -r <region>
 ```bash
 # 查看配置文件
 cat ~/.cos.yaml
-
-# 列出存储桶文件（验证权限）
-coscli ls cos://<bucket-alias>/
-
-# 或使用完整存储桶名称
-coscli ls cos://<bucket-name-appid>/
 ```
 
 ### 2. 测试上传
@@ -191,15 +185,8 @@ echo "Hello COS" > test.txt
 # 上传测试
 coscli cp test.txt cos://<bucket-alias>/test.txt
 
-# 验证上传
-coscli ls cos://<bucket-alias>/
-
-# 下载测试
-coscli cp cos://<bucket-alias>/test.txt test_download.txt
-
 # 清理测试文件
-rm test.txt test_download.txt
-coscli rm cos://<bucket-alias>/test.txt
+rm test.txt
 ```
 
 ## 故障排查
@@ -251,7 +238,7 @@ chmod 600 ~/.cos.yaml
 **解决方案**:
 1. 检查 Secret ID 和 Secret Key 是否正确
 2. 确认 API 密钥有 COS 相关权限
-3. 在腾讯云控制台检查访问管理策略
+3. 在腾讯云控制台检查访问管理策略，官方说明文档：https://cloud.tencent.com/document/product/436/63669
 
 ### 问题 5: NoSuchBucket 错误
 
@@ -289,44 +276,34 @@ chmod 600 ~/.cos.yaml
 ### 配置步骤
 
 1. **检查用户配置文件**
+
    ```bash
    # 确认 ~/.cos.yaml 存在且包含存储桶配置
    cat ~/.cos.yaml
    ```
 
 2. **列出可用存储桶**
+
    - 从 `~/.cos.yaml` 中读取所有已配置的存储桶
    - 展示给用户供选择
 
 3. **询问用户选择默认配置**
 
-   **示例对话：**
-   ```
-   检测到您已配置以下存储桶：
-   1. bucket1 (lifelmy-1314844974) - 南京区域
-   2. prod-bucket (mybucket-1250000000) - 上海区域
+   1. 请选择默认存储桶：列出已配置的存储桶列表
 
-   请选择默认存储桶（输入序号或别名）：1
-
-   请设置默认上传路径（如 uploads/, backup/, documents/，直接回车使用根目录 /）：
-   uploads/
-
-   配置已保存！后续上传将默认使用：
-   - 存储桶: bucket1
-   - 路径: uploads/
-   ```
+   2. 请设置默认上传路径：提示用户如 uploads/, backup/, documents/，直接回车使用根目录 /
 
 4. **保存配置到 `.env` 文件**
 
    编辑技能目录下的 `.env` 文件：
    ```bash
    # .env 文件路径: ~/.claude/skills/tencent-cos-skills/.env
-
+   
    # 设置默认存储桶别名
-   DEFAULT_BUCKET_ALIAS=bucket1
-
+   DEFAULT_BUCKET_ALIAS=
+   
    # 设置默认上传路径（路径末尾需要带斜杠）
-   DEFAULT_UPLOAD_PATH=uploads/
+   DEFAULT_UPLOAD_PATH=
    ```
 
 ### 配置参数说明
@@ -351,7 +328,7 @@ DEFAULT_BUCKET_ALIAS=bucket1
 ```bash
 # 用户只需说"上传文件到 COS"
 # 技能会自动使用默认存储桶和路径
-coscli cp file.txt cos://bucket1/uploads/file.txt
+coscli cp file.txt cos://${DEFAULT_UPLOAD_PATH}/${DEFAULT_BUCKET_ALIAS}/file.txt
 ```
 
 **用户仍可指定其他值：**
