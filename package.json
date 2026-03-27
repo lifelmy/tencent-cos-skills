@@ -1,6 +1,6 @@
 {
   "name": "tencent-cos-skills",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "腾讯云对象存储（COS）Claude Code 技能集 - 支持文件上传、下载、删除、存储桶管理等操作",
   "main": "scripts/install.js",
   "bin": {
