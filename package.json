@@ -1,0 +1,40 @@
+{
+  "name": "tencent-cos-skills",
+  "version": "1.0.0",
+  "description": "腾讯云对象存储（COS）Claude Code 技能集 - 支持文件上传、下载、删除、存储桶管理等操作",
+  "main": "scripts/install.js",
+  "bin": {
+    "tencent-cos-skills": "./scripts/install.js"
+  },
+  "scripts": {
+    "install": "node scripts/install.js",
+    "postinstall": "node scripts/install.js"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "tencent",
+    "cos",
+    "cloud-storage",
+    "file-upload",
+    "skills"
+  ],
+  "author": "lifelmy",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lifelmy/tencent-cos-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lifelmy/tencent-cos-skills/issues"
+  },
+  "homepage": "https://github.com/lifelmy/tencent-cos-skills#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "skills/",
+    "scripts/",
+    "README.md"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "skill_name": "tencent-cos-upload",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我想把本地的 /Users/bytedance/projects/myapp/dist 文件夹上传到腾讯云 COS，存储桶名称是 mybucket-1250000000，别名是 prod-bucket，区域是 ap-shanghai",
+      "expected_output": "使用 coscli 命令上传整个文件夹到 COS，支持递归上传",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "帮我上传 ~/Downloads/report.pdf 到腾讯云对象存储，我的存储桶叫 reports-bucket，区域在广州",
+      "expected_output": "提供上传单个 PDF 文件到 COS 的命令",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我有一堆图片在 /data/images 目录，想只上传 jpg 和 png 文件到 COS，不要上传其他文件，存储桶是 images-bucket-1250000000",
+      "expected_output": "使用 --include 参数过滤只上传 jpg 和 png 文件",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "第一次使用腾讯云 COS，需要上传我的网站静态文件。我已经有了 Secret ID 和 Secret Key，APPID 是 1250000000，存储桶叫 website-bucket-1250000000 在北京区域",
+      "expected_output": "引导用户完成 COSCLI 安装和配置，然后上传网站静态文件",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "上传大文件 /backup/database-2024.sql 到 COS，文件有 10GB，需要优化上传速度",
+      "expected_output": "提供大文件上传优化参数，包括分块大小和并发数设置",
+      "files": []
+    }
+  ]
+}
