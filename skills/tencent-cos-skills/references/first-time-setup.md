@@ -282,58 +282,99 @@ chmod 600 ~/.cos.yaml
    - 临时访问时使用 session token
    - 设置合理的过期时间
 
-## 技能默认配置（可选）
+## 技能默认配置（首次使用必需）
 
-完成 COSCLI 安装配置后，可以配置技能的默认参数，简化日常使用。
+完成 COSCLI 安装配置后，**首次使用技能时需要配置默认参数**，以简化后续操作。
 
-### 配置默认上传路径
+### 配置步骤
 
-编辑技能目录下的 `.env` 文件：
+1. **检查用户配置文件**
+   ```bash
+   # 确认 ~/.cos.yaml 存在且包含存储桶配置
+   cat ~/.cos.yaml
+   ```
 
-```bash
-# 找到技能安装目录下的 .env 文件
-# 如果没有 .env 文件，可以从 .env.example 复制
-cp .env.example .env
+2. **列出可用存储桶**
+   - 从 `~/.cos.yaml` 中读取所有已配置的存储桶
+   - 展示给用户供选择
 
-# 编辑配置
-vim .env
-```
+3. **询问用户选择默认配置**
 
-### 可配置参数
+   **示例对话：**
+   ```
+   检测到您已配置以下存储桶：
+   1. bucket1 (lifelmy-1314844974) - 南京区域
+   2. prod-bucket (mybucket-1250000000) - 上海区域
+
+   请选择默认存储桶（输入序号或别名）：1
+
+   请设置默认上传路径（如 uploads/, backup/, documents/，直接回车使用根目录 /）：
+   uploads/
+
+   配置已保存！后续上传将默认使用：
+   - 存储桶: bucket1
+   - 路径: uploads/
+   ```
+
+4. **保存配置到 `.env` 文件**
+
+   编辑技能目录下的 `.env` 文件：
+   ```bash
+   # .env 文件路径: ~/.claude/skills/tencent-cos-skills/.env
+
+   # 设置默认存储桶别名
+   DEFAULT_BUCKET_ALIAS=bucket1
+
+   # 设置默认上传路径（路径末尾需要带斜杠）
+   DEFAULT_UPLOAD_PATH=uploads/
+   ```
+
+### 配置参数说明
 
 ```bash
 # 默认上传路径
 # 上传文件时，如果没有指定具体路径，将上传到此文件夹
 # 示例: uploads/, backup/, documents/
-# 注意: 路径末尾需要带斜杠 /
+# 注意: 路径末尾需要带斜杠 /，根目录使用 /
 DEFAULT_UPLOAD_PATH=uploads/
 
 # 默认存储桶别名
 # 如果用户没有指定存储桶，默认使用此存储桶
 # 示例: mybucket, prod-bucket, backup-bucket
 # 注意: 需要在 ~/.cos.yaml 中已经配置了此别名
-DEFAULT_BUCKET_ALIAS=mybucket
+DEFAULT_BUCKET_ALIAS=bucket1
 ```
 
 ### 配置效果
 
-**未配置时：**
+**配置后的使用：**
 ```bash
-# 必须指定完整路径
-coscli cp file.txt cos://mybucket/path/to/file.txt
+# 用户只需说"上传文件到 COS"
+# 技能会自动使用默认存储桶和路径
+coscli cp file.txt cos://bucket1/uploads/file.txt
 ```
 
-**配置后：**
+**用户仍可指定其他值：**
 ```bash
-# 如果用户没有指定路径，自动使用默认路径
-coscli cp file.txt cos://mybucket/
-# 实际上传到: cos://mybucket/uploads/file.txt
+# 用户可以覆盖默认配置
+coscli cp file.txt cos://prod-bucket/backup/file.txt
 ```
 
-**注意：**
-- 这是可选配置，不配置也不影响正常使用
-- 如果用户在上传命令中明确指定了路径，将使用用户指定的路径（优先级更高）
-- `.env` 文件只影响本技能的行为，不会修改 COSCLI 工具本身的配置
+### 查看和修改配置
+
+```bash
+# 查看当前配置
+cat ~/.claude/skills/tencent-cos-skills/.env
+
+# 修改配置
+vim ~/.claude/skills/tencent-cos-skills/.env
+```
+
+**重要说明：**
+- ✅ 首次使用必须配置，后续操作将直接使用默认值
+- ✅ 用户可在任何操作中指定其他值，覆盖默认配置
+- ✅ 修改 `.env` 文件不会影响 COSCLI 工具本身的配置文件 `~/.cos.yaml`
+- ✅ 可以随时修改 `.env` 文件来调整默认行为
 
 ## 下一步
 
