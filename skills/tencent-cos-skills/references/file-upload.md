@@ -14,13 +14,7 @@
 
 **可用参数**:
 
-```bash
-# 默认上传路径（路径末尾需要带斜杠）
-DEFAULT_UPLOAD_PATH=uploads/
 
-# 默认存储桶别名（需要在 ~/.cos.yaml 中已配置）
-DEFAULT_BUCKET_ALIAS=mybucket
-```
 
 ## 目录
 
@@ -48,9 +42,12 @@ coscli cp <本地路径> <COS路径> [选项]
    ```
 
 2. **使用完整名称**:
+   
    ```
    cos://bucketname-appid/path/file.txt
    ```
+
+
 
 ### 常用参数
 
@@ -67,19 +64,22 @@ coscli cp <本地路径> <COS路径> [选项]
 | `--meta` | 文件元信息 | 无 |
 | `--acl` | 文件访问权限 | 私有 |
 
-### 默认配置（可选）
+### 路径默认值
 
-技能支持通过 `.env` 文件设置默认参数，简化上传命令。
+**COS 路径有两个部分：**
 
-**配置文件位置**: `技能目录/.env`
+1. bucket：使用 bucket 别名或者 完整名称 bucketname-appid
+2. path：桶内的文件夹路径
 
-**配置方法**: 参考 `first-time-setup.md` 中的"技能默认配置"章节
+支持通过 `.env` 文件获取默认 bucket 和 path。
+
+**配置文件位置**: `~/.claude/skills/tencent-cos-skills/.env`
 
 **可用参数**:
 
 ```bash
-# 默认上传路径（路径末尾需要带斜杠）
-DEFAULT_UPLOAD_PATH=uploads/
+# 默认上传文件夹（路径末尾需要带斜杠）
+DEFAULT_UPLOAD_PATH=
 
 # 默认存储桶别名（需要在 ~/.cos.yaml 中已配置）
 DEFAULT_BUCKET_ALIAS=mybucket
@@ -88,19 +88,21 @@ DEFAULT_BUCKET_ALIAS=mybucket
 **使用规则**:
 
 1. **用户指定了完整路径**: 使用用户指定的路径（优先级最高）
+   
    ```bash
    coscli cp file.txt cos://mybucket/documents/file.txt
    # 上传到: cos://mybucket/documents/file.txt
    ```
-
+   
 2. **用户指定了存储桶但未指定路径**: 使用默认路径（如果已配置）
    ```bash
-   # 假设配置了 DEFAULT_UPLOAD_PATH=uploads/
+   # 假设配置了 DEFAULT_UPLOAD_PATH=uploads/  DEFAULT_BUCKET_ALIAS=mybucket
    coscli cp file.txt cos://mybucket/
    # 实际上传到: cos://mybucket/uploads/file.txt
    ```
 
-3. **未配置默认参数**: 需要用户手动指定完整路径
+3. **未配置默认参数**: 直接上传至根目录
+   
    ```bash
    # 没有配置 .env 文件
    coscli cp file.txt cos://mybucket/file.txt  # 直接在根目录
@@ -110,7 +112,7 @@ DEFAULT_BUCKET_ALIAS=mybucket
 
 ```bash
 # 查看 .env 文件
-cat <技能目录>/.env
+cat ~/.claude/skills/tencent-cos-skills/.env
 ```
 
 **重要说明**:
@@ -456,6 +458,7 @@ done
 ### 问题 5: 软链接未被上传
 
 **解决方案:**
+
 ```bash
 # 上传软链接
 coscli cp ./folder/ cos://bucket/ -r \
