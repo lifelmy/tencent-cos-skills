@@ -40,40 +40,47 @@ uname -m  # arm64 (Apple Silicon) 或 x86_64 (Intel/AMD)
 - x86_64: `https://cosbrowser.cloud.tencent.com/software/coscli/coscli-linux-amd64`
 - ARM64: `https://cosbrowser.cloud.tencent.com/software/coscli/coscli-linux-arm64`
 
-### 3. 安装到系统路径
+### 3. 安装到用户专属目录
 
-**方法 A: 安装到 /usr/local/bin（推荐）**
+**创建专属目录并安装**
 
 ```bash
-# macOS Apple Silicon
-curl -o /usr/local/bin/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-darwin-arm64
-chmod 755 /usr/local/bin/coscli
+# 创建工具专属目录
+mkdir -p ~/.tencent-cos-skills
+
+# 下载 COSCLI 到专属目录
+# macOS Apple Silicon (M1/M2/M3)
+curl -L -o ~/.tencent-cos-skills/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-darwin-arm64
+chmod 755 ~/.tencent-cos-skills/coscli
 
 # macOS Intel
-curl -o /usr/local/bin/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-darwin-amd64
-chmod 755 /usr/local/bin/coscli
+curl -L -o ~/.tencent-cos-skills/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-darwin-amd64
+chmod 755 ~/.tencent-cos-skills/coscli
 
 # Linux x86_64
-curl -o /usr/local/bin/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-linux-amd64
-chmod 755 /usr/local/bin/coscli
+curl -L -o ~/.tencent-cos-skills/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-linux-amd64
+chmod 755 ~/.tencent-cos-skills/coscli
 
 # Linux ARM64
-curl -o /usr/local/bin/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-linux-arm64
-chmod 755 /usr/local/bin/coscli
-```
-
-**方法 B: 安装到用户目录（无需 sudo）**
-
-```bash
-# 创建用户 bin 目录
-mkdir -p ~/bin
-
-# 下载 COSCLI（以 macOS ARM64 为例）
-curl -o ~/bin/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-darwin-arm64
-chmod 755 ~/bin/coscli
+curl -L -o ~/.tencent-cos-skills/coscli https://cosbrowser.cloud.tencent.com/software/coscli/coscli-linux-arm64
+chmod 755 ~/.tencent-cos-skills/coscli
 
 # 添加到 PATH（需要在 ~/.bashrc 或 ~/.zshrc 中添加）
-export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/.tencent-cos-skills:$PATH"
+
+# 使配置生效
+source ~/.bashrc  # 或 source ~/.zshrc
+```
+
+**或使用 shell alias 方式**
+
+如果不想修改 PATH，可以添加 alias：
+
+```bash
+# 编辑 shell 配置文件
+echo 'alias coscli="$HOME/.tencent-cos-skills/coscli"' >> ~/.bashrc
+# 或
+echo 'alias coscli="$HOME/.tencent-cos-skills/coscli"' >> ~/.zshrc
 
 # 使配置生效
 source ~/.bashrc  # 或 source ~/.zshrc
@@ -191,34 +198,31 @@ rm test.txt
 
 ## 故障排查
 
-### 问题 1: Permission denied
+### 问题 1: Command not found
 
-**原因**: 没有写入 /usr/local/bin 的权限
-
-**解决方案**:
-```bash
-# 使用 sudo
-sudo curl -o /usr/local/bin/coscli https://...
-
-# 或安装到用户目录
-mkdir -p ~/bin
-curl -o ~/bin/coscli https://...
-chmod 755 ~/bin/coscli
-export PATH="$HOME/bin:$PATH"
-```
-
-### 问题 2: Command not found
-
-**原因**: coscli 不在 PATH 中
+**原因**: coscli 不在 PATH 中或 alias 未设置
 
 **解决方案**:
 ```bash
-# 检查 coscli 位置
-which coscli
+# 检查 coscli 是否存在
+ls -la ~/.tencent-cos-skills/coscli
 
-# 如果在 ~/bin，添加到 PATH
-echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+# 如果文件存在，检查是否可执行
+test -x ~/.tencent-cos-skills/coscli && echo "可执行" || echo "不可执行，需要 chmod +x"
+
+# 设置可执行权限
+chmod +x ~/.tencent-cos-skills/coscli
+
+# 方法 A: 添加到 PATH
+echo 'export PATH="$HOME/.tencent-cos-skills:$PATH"' >> ~/.bashrc
 source ~/.bashrc
+
+# 方法 B: 或使用 alias
+echo 'alias coscli="$HOME/.tencent-cos-skills/coscli"' >> ~/.bashrc
+source ~/.bashrc
+
+# 验证
+which coscli || alias coscli
 ```
 
 ### 问题 3: 配置文件权限错误
@@ -295,13 +299,13 @@ chmod 600 ~/.cos.yaml
 
 4. **保存配置到 `.env` 文件**
 
-   编辑技能目录下的 `.env` 文件：
+   编辑用户目录下的 `.env` 文件：
    ```bash
-   # .env 文件路径: ~/.claude/skills/tencent-cos-skills/.env
-   
+   # .env 文件路径: ~/.tencent-cos-skills/.env
+
    # 设置默认存储桶别名
    DEFAULT_BUCKET_ALIAS=
-   
+
    # 设置默认上传路径（路径末尾需要带斜杠）
    DEFAULT_UPLOAD_PATH=
    ```
@@ -341,10 +345,10 @@ coscli cp file.txt cos://prod-bucket/backup/file.txt
 
 ```bash
 # 查看当前配置
-cat ~/.claude/skills/tencent-cos-skills/.env
+cat ~/.tencent-cos-skills/.env
 
 # 修改配置
-vim ~/.claude/skills/tencent-cos-skills/.env
+vim ~/.tencent-cos-skills/.env
 ```
 
 **重要说明：**
